@@ -47,6 +47,22 @@ Route::prefix('v1')->group(function () use ($ctrl) {
     Route::post('register', [$ctrl['Auth'], 'register']);
     Route::post('login', [$ctrl['Auth'], 'login']);
 
+    // Mock FCM Endpoint for testing
+    Route::post('/fcm-mock', function (Request $request) {
+        Log::info('MOCK FCM RECEIVED:', $request->all());
+        return response()->json(['success' => true]);
+    });
+
+    Route::post('/debug/subscribe', function (Request $request) {
+        $token = $request->input('token');
+        $topic = $request->input('topic', 'teachers');
+        
+        $fcm = new \App\Services\FCMService();
+        $success = $fcm->subscribeToTopic($token, $topic);
+        
+        return response()->json(['success' => $success]);
+    });
+
     // Protected routes
     Route::group(['middleware' => ['auth:sanctum']], function () use ($ctrl) {
 
@@ -82,6 +98,7 @@ Route::prefix('v1')->group(function () use ($ctrl) {
 
         // Report message
         Route::post('reports/{report_id}/messages',     [$ctrl['ReportMessage'], 'store']);         //< store a new report message to the report; accessible by: teachers + student (reporter)
+        Route::get('messages/{id}',                     [$ctrl['ReportMessage'], 'show']);
         Route::get('report-messages/{id}',              [$ctrl['ReportMessage'], 'show']);          //< show a report message; accessible by: teachers + student (reporter)
         Route::patch('report-messages/{id}',            [$ctrl['ReportMessage'], 'update']);        //< update a report message; accessible by: teachers + student (reporter)
         Route::delete('report-messages/{id}',           [$ctrl['ReportMessage'], 'destroy']);       //< delete a report message; accessible by: teachers + student (reporter)

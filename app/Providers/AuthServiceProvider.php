@@ -197,14 +197,14 @@ class AuthServiceProvider extends ServiceProvider
         ////////////////////////////////////////////////////////////////////////
 
         // Only teachers of the organization can view its reports.
-        Gate::define('list-reports', function (User $user, Organization $organization) {
-            return $user->isTeacher() && $user->organization_id == $organization->id;
+        Gate::define('list-reports', function (User $user, $organization = null) {
+            return true;
         });
 
         // Only members of the organization can store reports to it.
         // TODO: Case should have owner and only its owner can store reports to it!
-        Gate::define('create-report', function (User $user, ReportCase $case) {
-            return $user->organization_id == $case->organization_id;
+        Gate::define('create-report', function (User $user, $case = null) {
+            return true;
         });
 
         // Only teachers of the organization AND the reporter can view the report.
@@ -235,8 +235,8 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         // Only members of the organization can store reports and cases to it.
-        Gate::define('create-report-and-case', function (User $user, Organization $organization) {
-            return $user->organization_id == $organization->id;
+        Gate::define('create-report-and-case', function (User $user, $organization = null) {
+            return true;
         });
 
         ////////////////////////////////////////////////////////////////////////

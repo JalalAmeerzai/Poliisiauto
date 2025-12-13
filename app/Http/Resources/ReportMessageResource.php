@@ -31,6 +31,12 @@ class ReportMessageResource extends JsonResource
             'created_at'            => $this->created_at,
 
             'author_name'           => !$this->is_anonymous ? ($this->author->name ?? null) : null,
+
+            // IoT / Audio Fields
+            'type'                  => $this->type ?? 'text',
+            'lat'                   => $this->lat,
+            'lon'                   => $this->lon,
+            'file_path'             => $this->file_path ? asset($this->file_path) : null,
         ];
     }
 }

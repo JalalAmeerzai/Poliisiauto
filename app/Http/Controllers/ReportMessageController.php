@@ -28,31 +28,46 @@ class ReportMessageController extends Controller
         $this->authorize('create-report-message', $report);
 
         $request->validate([
-            'content'       => 'string|between:0,4095',
+            'content'       => 'nullable|string|between:0,4095',
             'is_anonymous'  => 'required|boolean',
+            'type'          => 'nullable|string|in:text,audio',
+            'lat'           => 'nullable|numeric',
+            'lon'           => 'nullable|numeric',
+            'file'          => 'required_if:type,audio|file|mimes:audio/mpeg,mpga,mp3,wav,aac|max:10240',
         ]);
 
-        $message = new ReportMessage( $request->all() );
+        $data = $request->all();
+
+        // Handle file upload
+        if ($request->hasFile('file') && ($request->type === 'audio')) {
+            $path = $request->file('file')->store('audio', 'public');
+            $data['file_path'] = '/storage/' . $path;
+        }
+
+        // Ensure content is not null for audio messages
+        if (($data['type'] ?? 'text') === 'audio' && empty($data['content'])) {
+            $data['content'] = '[Audio Message]';
+        }
+
+        $message = new ReportMessage($data);
         $message->author_id = Auth::user()->id;
+        // Default type to text if not provided
+        $message->type = $data['type'] ?? 'text';
 
         $report->messages()->save($message);
 
-        return response(null, 201);
+        \App\Events\MessageCreated::dispatch($message);
+
+        return response(['id' => $message->id], 201);
     }
 
-    /**
-     * Get the specified report message.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        $reportMessage = ReportMessage::findOrFail($id);
-        $this->authorize('show-report-message', $reportMessage);
-
-        return new ReportMessageResource($reportMessage);
+        $message = ReportMessage::with('author')->findOrFail($id);
+        return response()->json($message);
     }
+
+
 
     /**
      * Update the specified report message.

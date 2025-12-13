@@ -46,7 +46,7 @@ class AuthController extends Controller
 
         Log::debug("User $user->email registered.");
 
-        return $user->createToken($request->device_name)->plainTextToken;
+        return ['access_token' => $user->createToken($request->device_name)->plainTextToken];
     }
 
     /**
@@ -77,7 +77,7 @@ class AuthController extends Controller
 
         Log::debug("User $user->email logged in.");
      
-        return $user->createToken($request->device_name)->plainTextToken;
+        return ['access_token' => $user->createToken($request->device_name)->plainTextToken];
     }
 
     /**

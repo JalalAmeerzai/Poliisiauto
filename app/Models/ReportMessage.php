@@ -20,7 +20,7 @@ class ReportMessage extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['content', 'is_anonymous'];
+    protected $fillable = ['content', 'is_anonymous', 'type', 'lat', 'lon', 'file_path'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -49,11 +49,6 @@ class ReportMessage extends Model
      */
     public function author()
     {
-        // FIXME: Obviously we should not do this :()
-        $role = \DB::table('users')->where('id', $this->author_id)->first('role');
-        return !empty($role)
-            ? $this->belongsTo(\App\Role::getRoleModel($role->role))
-            : null;
-        //return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 }

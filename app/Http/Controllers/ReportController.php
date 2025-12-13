@@ -60,7 +60,7 @@ class ReportController extends Controller
 
         $case->reports()->save($report);
 
-        return response(null, 201);
+        return new ReportResource($report);
     }
 
     /**

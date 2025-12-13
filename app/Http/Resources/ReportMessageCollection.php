@@ -23,17 +23,7 @@ class ReportMessageCollection extends ResourceCollection
     public function toArray($request)
     {
         return $this->collection->map(function($res) {
-            return [
-                'id'                    => $res->id,
-                'content'               => $res->content,
-                'report_id'             => $res->report_id,
-                'author_id'             => !$res->is_anonymous ? ($res->author_id ?? null) : null,
-                'is_anonymous'          => $res->is_anonymous,
-                'created_at'            => $res->created_at,
-
-                'author_name'           => !$res->is_anonymous ? ($res->author->name ?? null) : null,
-            ];
+            return new ReportMessageResource($res);
         });
-        // return parent::toArray($request);
     }
 }

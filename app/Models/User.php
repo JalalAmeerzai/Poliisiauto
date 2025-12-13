@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Role;
 
-abstract class User extends Authenticatable
+class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
@@ -68,7 +68,7 @@ abstract class User extends Authenticatable
      */
     protected static function booted()
     {
-        static::addGlobalScope(new Scopes\Role);
+        // static::addGlobalScope(new Scopes\Role);
     }
 
     /**
