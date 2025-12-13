@@ -42,5 +42,10 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Expose port 80
 EXPOSE 80
 
+# Create database file and set permissions
+RUN touch /var/www/html/database/database.sqlite
+RUN chown www-data:www-data /var/www/html/database/database.sqlite
+RUN chmod 775 /var/www/html/database/database.sqlite
+
 # Run migrations and start Apache
 CMD php artisan migrate --force && apache2-foreground
