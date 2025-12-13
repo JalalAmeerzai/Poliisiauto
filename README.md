@@ -1,8 +1,4 @@
-## Important notice!
 
-**This is a prototype and must not be used in practice under any circumstances! The developers of this application do not take any responsibility, legal or otherwise, of using this application!**
-
----
 
 # Poliisiauto server
 
@@ -41,36 +37,36 @@ $ cp .env.example .env
 ```
 
 Change necessary values in the `.env` files.
-44: 
-45: ### Database Configuration
-46: 
-47: **Default: SQLite**
-48: By default, the application uses SQLite, which requires zero configuration.
-49: ```yaml
-50: DB_CONNECTION=sqlite
-51: # DB_DATABASE is not needed for SQLite default setup
-52: ```
-53: 
-54: **Option: MySQL / PostgreSQL**
-55: If you prefer to use another database, update `.env` accordingly:
-56: ```yaml
-57: DB_CONNECTION=mysql
-58: DB_HOST=127.0.0.1
-59: DB_PORT=3306
-60: DB_DATABASE=poliisiauto
-61: DB_USERNAME=root
-62: DB_PASSWORD=secret
-63: ```
-64: 
-65: Generate an application key:
-66: ```bash
-67: $ php artisan key:generate
-68: ```
-69: 
-70: Migrate the database (see [here](https://laravel.com/docs/9.x/migrations) for more information):
-71: ```bash
-72: $ php artisan migrate:fresh
-73: ```
+
+### Database Configuration
+
+**Default: SQLite**
+By default, the application uses SQLite, which requires zero configuration.
+```yaml
+DB_CONNECTION=sqlite
+# DB_DATABASE is not needed for SQLite default setup
+```
+
+**Option: MySQL / PostgreSQL**
+If you prefer to use another database, update `.env` accordingly:
+```yaml
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=poliisiauto
+DB_USERNAME=root
+DB_PASSWORD=secret
+```
+
+Generate an application key:
+```bash
+$ php artisan key:generate
+```
+
+Migrate the database (see [here](https://laravel.com/docs/9.x/migrations) for more information):
+```bash
+$ php artisan migrate:fresh
+```
 
 **NOTE:** You may need to change the permissions of some folders (usually everything under `storage`).
 
