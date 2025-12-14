@@ -134,7 +134,7 @@
                     statusDiv.innerText = "Status: Permission granted. Registering Service Worker...";
 
                     // Explicitly register Service Worker
-                    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js');
                     console.log('Service Worker registered:', registration);
 
                     statusDiv.innerText = "Status: Getting token...";
