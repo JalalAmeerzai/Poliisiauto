@@ -96,6 +96,11 @@ class FCMService
     public function subscribeToTopic($token, $topic)
     {
         $credentialsPath = storage_path('app/firebase_credentials.json');
+        if (!file_exists($credentialsPath)) {
+            // Fallback for Render Secret Files
+            $credentialsPath = '/etc/secrets/firebase_credentials.json';
+        }
+        
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
         $middleware = new \Google\Auth\Credentials\ServiceAccountCredentials($scopes, $credentialsPath);
         $authToken = $middleware->fetchAuthToken(\Google\Auth\HttpHandler\HttpHandlerFactory::build());
