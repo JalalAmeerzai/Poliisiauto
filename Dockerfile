@@ -48,4 +48,4 @@ RUN chown -R www-data:www-data /var/www/html/database
 RUN chmod -R 775 /var/www/html/database
 
 # Run migrations, link storage, and start Apache
-CMD php artisan migrate --force && php artisan storage:link && apache2-foreground
+CMD if [ -f /etc/secrets/firebase_credentials.json ]; then cp /etc/secrets/firebase_credentials.json /var/www/html/storage/app/firebase_credentials.json && chown www-data:www-data /var/www/html/storage/app/firebase_credentials.json; fi && php artisan migrate --force && php artisan storage:link && apache2-foreground
