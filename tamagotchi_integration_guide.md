@@ -5,7 +5,7 @@ This guide details the steps for the "Tamagotchi" device to interact with the Po
 **Git Repository:** [https://github.com/JalalAmeerzai/Poliisiauto.git](https://github.com/JalalAmeerzai/Poliisiauto.git)
 
 ### Base URLs
-*   **Production (Render):** `https://poliisiauto.onrender.com`
+*   **Production (Render):** `https://poliisiautoweb.onrender.com`
 *   **Localhost:** `http://127.0.0.1:8000`
 
 ---
@@ -18,7 +18,7 @@ The device must first register to get an `access_token`. This token is required 
 
 **cURL:**
 ```bash
-curl -X POST https://poliisiauto.onrender.com/api/v1/register \
+curl -X POST https://poliisiautoweb.onrender.com/api/v1/register \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
   -d '{
@@ -49,7 +49,7 @@ To send messages, you first need a "Report" (which acts as a conversation contai
 
 **cURL:**
 ```bash
-curl -X POST https://poliisiauto.onrender.com/api/v1/reports \
+curl -X POST https://poliisiautoweb.onrender.com/api/v1/reports \
   -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
@@ -93,7 +93,7 @@ curl -X POST https://poliisiauto.onrender.com/api/v1/reports \
 
 **cURL:**
 ```bash
-curl -X POST https://poliisiauto.onrender.com/api/v1/reports/15/messages \
+curl -X POST https://poliisiautoweb.onrender.com/api/v1/reports/15/messages \
   -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
   -H "Content-Type: application/json" \
   -H "Accept: application/json" \
@@ -120,7 +120,7 @@ curl -X POST https://poliisiauto.onrender.com/api/v1/reports/15/messages \
 
 **cURL:**
 ```bash
-curl -X POST https://poliisiauto.onrender.com/api/v1/reports/15/messages \
+curl -X POST https://poliisiautoweb.onrender.com/api/v1/reports/15/messages \
   -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>" \
   -H "Accept: application/json" \
   -F "file=@/path/to/audio.wav" \
@@ -179,7 +179,7 @@ When the notification arrives, the app extracts the `message_id` (e.g., `101`) f
 
 **cURL:**
 ```bash
-curl -X GET https://poliisiauto.onrender.com/api/v1/messages/101 \
+curl -X GET https://poliisiautoweb.onrender.com/api/v1/messages/101 \
   -H "Authorization: Bearer <TEACHER_ACCESS_TOKEN>" \
   -H "Accept: application/json"
 ```
@@ -214,7 +214,7 @@ curl -X GET https://poliisiauto.onrender.com/api/v1/messages/101 \
     "type": "audio",
     "lat": 60.1699,
     "lon": 24.9384,
-    "file_path": "https://poliisiauto.onrender.com/storage/audio/abcdef123456.wav"
+    "file_path": "https://poliisiautoweb.onrender.com/storage/audio/abcdef123456.wav"
 }
 ```
 
