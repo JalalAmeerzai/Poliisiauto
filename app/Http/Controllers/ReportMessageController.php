@@ -64,7 +64,7 @@ class ReportMessageController extends Controller
     public function show($id)
     {
         $message = ReportMessage::with('author')->findOrFail($id);
-        return response()->json($message);
+        return new ReportMessageResource($message);
     }
 
 
