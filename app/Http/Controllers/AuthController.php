@@ -37,11 +37,21 @@ class AuthController extends Controller
             'device_name'   => 'required|string'
         ]);
 
+        // Ensure a default organization exists
+        $organization = \App\Models\Organization::firstOrCreate([
+            'name' => 'Default Organization'
+        ], [
+            'street_address' => 'Default Street 1',
+            'city'           => 'Default City',
+            'zip'            => '00000'
+        ]);
+
         $user = Student::create([
             'first_name'    => $request->first_name,
             'last_name'     => $request->last_name,
             'email'         => $request->email,
-            'password'      => Hash::make($request->password)
+            'password'      => Hash::make($request->password),
+            'organization_id' => $organization->id
         ]);
 
         Log::debug("User $user->email registered.");
