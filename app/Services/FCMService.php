@@ -96,13 +96,23 @@ class FCMService
     public function subscribeToTopic($token, $topic)
     {
         $credentialsPath = storage_path('app/firebase_credentials.json');
-        if (!file_exists($credentialsPath)) {
-            // Fallback for Render Secret Files
+        if (file_exists('/etc/secrets/firebase_credentials.json')) {
             $credentialsPath = '/etc/secrets/firebase_credentials.json';
+        } else {
+            $credentialsPath = storage_path('app/firebase_credentials.json');
         }
-        
+
+        if (!file_exists($credentialsPath)) {
+            throw new \Exception("Firebase credentials file not found at: " . $credentialsPath);
+        }
+
+        $jsonKey = json_decode(file_get_contents($credentialsPath), true);
+        if (isset($jsonKey['private_key'])) {
+            $jsonKey['private_key'] = str_replace('\\n', "\n", $jsonKey['private_key']);
+        }
+
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        $middleware = new \Google\Auth\Credentials\ServiceAccountCredentials($scopes, $credentialsPath);
+        $middleware = new \Google\Auth\Credentials\ServiceAccountCredentials($scopes, $jsonKey);
         $authToken = $middleware->fetchAuthToken(\Google\Auth\HttpHandler\HttpHandlerFactory::build());
         $accessToken = $authToken['access_token'];
 
