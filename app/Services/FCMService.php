@@ -145,8 +145,6 @@ class FCMService
                 $sslSuccess = 'FCM: OpenSSL successfully parsed the key.';
                 \Log::info($sslSuccess);
                 error_log($sslSuccess);
-                // Free the key resource if PHP < 8.0 (optional but good practice)
-                // openssl_free_key($pkey); 
             }
         } else {
             $msg = 'FCM: private_key not found in credentials JSON';
@@ -154,10 +152,21 @@ class FCMService
             error_log($msg);
         }
 
+        // Log Server Time
+        $timeMsg = 'FCM: Server Time: ' . date('Y-m-d H:i:s P');
+        \Log::info($timeMsg);
+        error_log($timeMsg);
+
         if (isset($jsonKey['client_email'])) {
             $msg = 'FCM: Using client_email: ' . $jsonKey['client_email'];
             \Log::info($msg);
             error_log($msg);
+        }
+
+        if (isset($jsonKey['private_key_id'])) {
+            $idMsg = 'FCM: Using private_key_id: ' . $jsonKey['private_key_id'];
+            \Log::info($idMsg);
+            error_log($idMsg);
         }
 
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
