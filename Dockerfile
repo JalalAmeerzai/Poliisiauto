@@ -44,8 +44,8 @@ EXPOSE 80
 
 # Create database file and set permissions
 RUN touch /var/www/html/database/database.sqlite
-RUN chown www-data:www-data /var/www/html/database/database.sqlite
-RUN chmod 775 /var/www/html/database/database.sqlite
+RUN chown -R www-data:www-data /var/www/html/database
+RUN chmod -R 775 /var/www/html/database
 
 # Run migrations and start Apache
 CMD php artisan migrate --force && apache2-foreground
