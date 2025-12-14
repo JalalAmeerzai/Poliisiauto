@@ -128,6 +128,26 @@ class FCMService
             error_log($msg2);
             \Log::info($msg3);
             error_log($msg3);
+
+            // Hex dump to see exact bytes (first 100 chars)
+            $hex = bin2hex(substr($jsonKey['private_key'], 0, 100));
+            $msgHex = 'FCM: Private key hex dump (first 100 chars): ' . $hex;
+            \Log::info($msgHex);
+            error_log($msgHex);
+
+            // Verify if OpenSSL accepts it
+            $pkey = openssl_pkey_get_private($jsonKey['private_key']);
+            if ($pkey === false) {
+                $sslError = 'FCM: OpenSSL could not parse the key: ' . openssl_error_string();
+                \Log::error($sslError);
+                error_log($sslError);
+            } else {
+                $sslSuccess = 'FCM: OpenSSL successfully parsed the key.';
+                \Log::info($sslSuccess);
+                error_log($sslSuccess);
+                // Free the key resource if PHP < 8.0 (optional but good practice)
+                // openssl_free_key($pkey); 
+            }
         } else {
             $msg = 'FCM: private_key not found in credentials JSON';
             \Log::error($msg);
