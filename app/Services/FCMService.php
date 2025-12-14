@@ -105,8 +105,27 @@ class FCMService
         }
 
         $jsonKey = json_decode(file_get_contents($credentialsPath), true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            \Log::error('FCM: JSON decode error: ' . json_last_error_msg());
+            throw new \Exception("Failed to decode Firebase credentials JSON: " . json_last_error_msg());
+        }
+
         if (isset($jsonKey['private_key'])) {
+            // Log the key before replacement (masked)
+            \Log::info('FCM: Private key before processing: ' . substr($jsonKey['private_key'], 0, 50) . '...');
+            
             $jsonKey['private_key'] = str_replace('\\n', "\n", $jsonKey['private_key']);
+            
+            // Log the key after replacement (masked) and check for newlines
+            \Log::info('FCM: Private key after processing: ' . substr($jsonKey['private_key'], 0, 50) . '...');
+            \Log::info('FCM: Private key contains newlines: ' . (strpos($jsonKey['private_key'], "\n") !== false ? 'Yes' : 'No'));
+        } else {
+            \Log::error('FCM: private_key not found in credentials JSON');
+        }
+
+        if (isset($jsonKey['client_email'])) {
+            \Log::info('FCM: Using client_email: ' . $jsonKey['client_email']);
         }
 
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
