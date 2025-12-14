@@ -47,5 +47,5 @@ RUN touch /var/www/html/database/database.sqlite
 RUN chown -R www-data:www-data /var/www/html/database
 RUN chmod -R 775 /var/www/html/database
 
-# Run migrations and start Apache
-CMD php artisan migrate --force && apache2-foreground
+# Run migrations, link storage, and start Apache
+CMD php artisan migrate --force && php artisan storage:link && apache2-foreground
