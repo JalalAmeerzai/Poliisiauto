@@ -107,25 +107,37 @@ class FCMService
         $jsonKey = json_decode(file_get_contents($credentialsPath), true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            \Log::error('FCM: JSON decode error: ' . json_last_error_msg());
+            $errorMsg = 'FCM: JSON decode error: ' . json_last_error_msg();
+            \Log::error($errorMsg);
+            error_log($errorMsg);
             throw new \Exception("Failed to decode Firebase credentials JSON: " . json_last_error_msg());
         }
 
         if (isset($jsonKey['private_key'])) {
             // Log the key before replacement (masked)
-            \Log::info('FCM: Private key before processing: ' . substr($jsonKey['private_key'], 0, 50) . '...');
+            $msg1 = 'FCM: Private key before processing: ' . substr($jsonKey['private_key'], 0, 50) . '...';
+            \Log::info($msg1);
+            error_log($msg1);
             
             $jsonKey['private_key'] = str_replace('\\n', "\n", $jsonKey['private_key']);
             
             // Log the key after replacement (masked) and check for newlines
-            \Log::info('FCM: Private key after processing: ' . substr($jsonKey['private_key'], 0, 50) . '...');
-            \Log::info('FCM: Private key contains newlines: ' . (strpos($jsonKey['private_key'], "\n") !== false ? 'Yes' : 'No'));
+            $msg2 = 'FCM: Private key after processing: ' . substr($jsonKey['private_key'], 0, 50) . '...';
+            $msg3 = 'FCM: Private key contains newlines: ' . (strpos($jsonKey['private_key'], "\n") !== false ? 'Yes' : 'No');
+            \Log::info($msg2);
+            error_log($msg2);
+            \Log::info($msg3);
+            error_log($msg3);
         } else {
-            \Log::error('FCM: private_key not found in credentials JSON');
+            $msg = 'FCM: private_key not found in credentials JSON';
+            \Log::error($msg);
+            error_log($msg);
         }
 
         if (isset($jsonKey['client_email'])) {
-            \Log::info('FCM: Using client_email: ' . $jsonKey['client_email']);
+            $msg = 'FCM: Using client_email: ' . $jsonKey['client_email'];
+            \Log::info($msg);
+            error_log($msg);
         }
 
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
