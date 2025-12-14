@@ -96,10 +96,8 @@ class FCMService
     public function subscribeToTopic($token, $topic)
     {
         $credentialsPath = storage_path('app/firebase_credentials.json');
-        if (file_exists('/etc/secrets/firebase_credentials.json')) {
+        if (!file_exists($credentialsPath) && file_exists('/etc/secrets/firebase_credentials.json')) {
             $credentialsPath = '/etc/secrets/firebase_credentials.json';
-        } else {
-            $credentialsPath = storage_path('app/firebase_credentials.json');
         }
 
         if (!file_exists($credentialsPath)) {
