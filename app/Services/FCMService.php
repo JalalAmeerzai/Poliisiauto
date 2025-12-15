@@ -47,21 +47,32 @@ class FCMService
         }
 
         // Get OAuth 2.0 Token
-        $credentialsPath = storage_path('app/firebase_credentials.json');
-        if (!file_exists($credentialsPath) && file_exists('/etc/secrets/firebase_credentials.json')) {
-            $credentialsPath = '/etc/secrets/firebase_credentials.json';
-        }
+        $jsonKey = null;
+        $envCredentials = env('FIREBASE_CREDENTIALS');
+        
+        if (!empty($envCredentials)) {
+            $jsonKey = json_decode($envCredentials, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('FCM: JSON decode error from FIREBASE_CREDENTIALS env: ' . json_last_error_msg());
+                return false;
+            }
+        } else {
+            $credentialsPath = storage_path('app/firebase_credentials.json');
+            if (!file_exists($credentialsPath) && file_exists('/etc/secrets/firebase_credentials.json')) {
+                $credentialsPath = '/etc/secrets/firebase_credentials.json';
+            }
 
-        if (!file_exists($credentialsPath)) {
-            Log::error("Firebase credentials file not found at: $credentialsPath");
-            return false;
-        }
+            if (!file_exists($credentialsPath)) {
+                Log::error("Firebase credentials file not found at: $credentialsPath");
+                return false;
+            }
 
-        // Manually decode and fix the private key if needed
-        $jsonKey = json_decode(file_get_contents($credentialsPath), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::error('FCM: JSON decode error: ' . json_last_error_msg());
-            return false;
+            // Manually decode and fix the private key if needed
+            $jsonKey = json_decode(file_get_contents($credentialsPath), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('FCM: JSON decode error: ' . json_last_error_msg());
+                return false;
+            }
         }
 
         if (isset($jsonKey['private_key'])) {
@@ -110,22 +121,34 @@ class FCMService
 
     public function subscribeToTopic($token, $topic)
     {
-        $credentialsPath = storage_path('app/firebase_credentials.json');
-        if (!file_exists($credentialsPath) && file_exists('/etc/secrets/firebase_credentials.json')) {
-            $credentialsPath = '/etc/secrets/firebase_credentials.json';
-        }
+        $jsonKey = null;
+        $envCredentials = env('FIREBASE_CREDENTIALS');
 
-        if (!file_exists($credentialsPath)) {
-            throw new \Exception("Firebase credentials file not found at: " . $credentialsPath);
-        }
+        if (!empty($envCredentials)) {
+            $jsonKey = json_decode($envCredentials, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $errorMsg = 'FCM: JSON decode error from FIREBASE_CREDENTIALS env: ' . json_last_error_msg();
+                \Log::error($errorMsg);
+                throw new \Exception($errorMsg);
+            }
+        } else {
+            $credentialsPath = storage_path('app/firebase_credentials.json');
+            if (!file_exists($credentialsPath) && file_exists('/etc/secrets/firebase_credentials.json')) {
+                $credentialsPath = '/etc/secrets/firebase_credentials.json';
+            }
 
-        $jsonKey = json_decode(file_get_contents($credentialsPath), true);
-        
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            $errorMsg = 'FCM: JSON decode error: ' . json_last_error_msg();
-            \Log::error($errorMsg);
-            error_log($errorMsg);
-            throw new \Exception("Failed to decode Firebase credentials JSON: " . json_last_error_msg());
+            if (!file_exists($credentialsPath)) {
+                throw new \Exception("Firebase credentials file not found at: " . $credentialsPath);
+            }
+
+            $jsonKey = json_decode(file_get_contents($credentialsPath), true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $errorMsg = 'FCM: JSON decode error: ' . json_last_error_msg();
+                \Log::error($errorMsg);
+                error_log($errorMsg);
+                throw new \Exception("Failed to decode Firebase credentials JSON: " . json_last_error_msg());
+            }
         }
 
         if (isset($jsonKey['private_key'])) {
