@@ -208,6 +208,11 @@ class FCMService
             $idMsg = 'FCM: Using private_key_id: ' . $jsonKey['private_key_id'];
             \Log::info($idMsg);
             error_log($idMsg);
+            // EXPERIMENT: Unset private_key_id to see if Google accepts the token without the kid header
+            // or if the ID was mismatched.
+            unset($jsonKey['private_key_id']);
+            \Log::info("FCM: Unset private_key_id for testing.");
+            error_log("FCM: Unset private_key_id for testing.");
         }
 
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
