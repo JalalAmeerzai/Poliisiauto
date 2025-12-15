@@ -48,13 +48,28 @@ class FCMService
 
         // Get OAuth 2.0 Token
         $credentialsPath = storage_path('app/firebase_credentials.json');
+        if (!file_exists($credentialsPath) && file_exists('/etc/secrets/firebase_credentials.json')) {
+            $credentialsPath = '/etc/secrets/firebase_credentials.json';
+        }
+
         if (!file_exists($credentialsPath)) {
             Log::error("Firebase credentials file not found at: $credentialsPath");
             return false;
         }
 
+        // Manually decode and fix the private key if needed
+        $jsonKey = json_decode(file_get_contents($credentialsPath), true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Log::error('FCM: JSON decode error: ' . json_last_error_msg());
+            return false;
+        }
+
+        if (isset($jsonKey['private_key'])) {
+            $jsonKey['private_key'] = str_replace('\\n', "\n", $jsonKey['private_key']);
+        }
+
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
-        $middleware = new \Google\Auth\Credentials\ServiceAccountCredentials($scopes, $credentialsPath);
+        $middleware = new \Google\Auth\Credentials\ServiceAccountCredentials($scopes, $jsonKey);
         $token = $middleware->fetchAuthToken(\Google\Auth\HttpHandler\HttpHandlerFactory::build());
         $accessToken = $token['access_token'];
 
