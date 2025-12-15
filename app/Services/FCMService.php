@@ -204,10 +204,9 @@ class FCMService
             error_log($msg);
         }
 
-            unset($jsonKey['private_key_id']);
-            \Log::info("FCM: Unset private_key_id for testing.");
-            error_log("FCM: Unset private_key_id for testing.");
-        }
+        unset($jsonKey['private_key_id']);
+        \Log::info("FCM: Unset private_key_id for testing.");
+        error_log("FCM: Unset private_key_id for testing.");
 
         // --- VERIFY KEY AGAINST EMAIL ---
         if (isset($jsonKey['client_email'])) {
