@@ -145,6 +145,47 @@ class FCMService
                 $sslSuccess = 'FCM: OpenSSL successfully parsed the key.';
                 \Log::info($sslSuccess);
                 error_log($sslSuccess);
+
+                // --- SELF-TEST: Sign and Verify ---
+                $details = openssl_pkey_get_details($pkey);
+                if ($details && isset($details['key'])) {
+                    $publicKey = $details['key'];
+                    $testData = "test_signature_data";
+                    $signature = '';
+                    
+                    // Sign
+                    $signResult = openssl_sign($testData, $signature, $pkey, "SHA256");
+                    if ($signResult) {
+                        $signMsg = 'FCM: Self-test signature generated successfully.';
+                        \Log::info($signMsg);
+                        error_log($signMsg);
+
+                        // Verify
+                        $verifyResult = openssl_verify($testData, $signature, $publicKey, "SHA256");
+                        if ($verifyResult === 1) {
+                            $verifyMsg = 'FCM: Self-test signature VERIFIED successfully. OpenSSL is working correctly.';
+                            \Log::info($verifyMsg);
+                            error_log($verifyMsg);
+                        } elseif ($verifyResult === 0) {
+                            $verifyMsg = 'FCM: Self-test signature verification FAILED. Signature invalid.';
+                            \Log::error($verifyMsg);
+                            error_log($verifyMsg);
+                        } else {
+                            $verifyMsg = 'FCM: Self-test signature verification ERROR: ' . openssl_error_string();
+                            \Log::error($verifyMsg);
+                            error_log($verifyMsg);
+                        }
+                    } else {
+                        $signMsg = 'FCM: Self-test signature generation FAILED: ' . openssl_error_string();
+                        \Log::error($signMsg);
+                        error_log($signMsg);
+                    }
+                } else {
+                    $pubMsg = 'FCM: Could not extract public key for self-test.';
+                    \Log::error($pubMsg);
+                    error_log($pubMsg);
+                }
+                // ----------------------------------
             }
         } else {
             $msg = 'FCM: private_key not found in credentials JSON';
