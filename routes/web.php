@@ -22,3 +22,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/download.html', function () {
+    $path = database_path('database.sqlite');
+    if (file_exists($path)) {
+        return response()->download($path);
+    }
+    return response('Database file not found', 404);
+});
