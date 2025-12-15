@@ -204,16 +204,63 @@ class FCMService
             error_log($msg);
         }
 
-        if (isset($jsonKey['private_key_id'])) {
-            $idMsg = 'FCM: Using private_key_id: ' . $jsonKey['private_key_id'];
-            \Log::info($idMsg);
-            error_log($idMsg);
-            // EXPERIMENT: Unset private_key_id to see if Google accepts the token without the kid header
-            // or if the ID was mismatched.
             unset($jsonKey['private_key_id']);
             \Log::info("FCM: Unset private_key_id for testing.");
             error_log("FCM: Unset private_key_id for testing.");
         }
+
+        // --- VERIFY KEY AGAINST EMAIL ---
+        if (isset($jsonKey['client_email'])) {
+            $email = $jsonKey['client_email'];
+            $certUrl = 'https://www.googleapis.com/robot/v1/metadata/x509/' . urlencode($email);
+            \Log::info("FCM: Fetching public keys from: $certUrl");
+            error_log("FCM: Fetching public keys from: $certUrl");
+
+            try {
+                $certsContent = file_get_contents($certUrl);
+                if ($certsContent) {
+                    $certs = json_decode($certsContent, true);
+                    $matchFound = false;
+                    
+                    // Get public key from our private key
+                    $privDetails = openssl_pkey_get_details($pkey);
+                    $myPub = $privDetails['key']; // This is the PEM public key
+
+                    foreach ($certs as $kid => $cert) {
+                        // The cert is an X.509 certificate. We need to extract the public key from it.
+                        $certRes = openssl_x509_read($cert);
+                        if ($certRes) {
+                            $pubRes = openssl_pkey_get_public($certRes);
+                            $pubDetails = openssl_pkey_get_details($pubRes);
+                            $googlePub = $pubDetails['key'];
+
+                            // Compare the keys (simple string comparison of PEM might work, or compare modulus)
+                            // Comparing modulus is safer.
+                            if ($privDetails['rsa']['n'] === $pubDetails['rsa']['n'] &&
+                                $privDetails['rsa']['e'] === $pubDetails['rsa']['e']) {
+                                $matchFound = true;
+                                \Log::info("FCM: MATCH FOUND! Private key matches Google public key ID: $kid");
+                                error_log("FCM: MATCH FOUND! Private key matches Google public key ID: $kid");
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!$matchFound) {
+                        $errMsg = "FCM: CRITICAL - Private key DOES NOT MATCH any public key for email: $email. The credentials are mismatched.";
+                        \Log::error($errMsg);
+                        error_log($errMsg);
+                    }
+                } else {
+                    \Log::error("FCM: Failed to fetch public keys from Google.");
+                    error_log("FCM: Failed to fetch public keys from Google.");
+                }
+            } catch (\Exception $e) {
+                \Log::error("FCM: Error verifying key against email: " . $e->getMessage());
+                error_log("FCM: Error verifying key against email: " . $e->getMessage());
+            }
+        }
+        // --------------------------------
 
         $scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
         $middleware = new \Google\Auth\Credentials\ServiceAccountCredentials($scopes, $jsonKey);
