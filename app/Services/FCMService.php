@@ -119,7 +119,7 @@ class FCMService
             \Log::info($msg1);
             error_log($msg1);
             
-            // $jsonKey['private_key'] = str_replace('\\n', "\n", $jsonKey['private_key']);
+            $jsonKey['private_key'] = str_replace('\\n', "\n", $jsonKey['private_key']);
             
             // Log the key after replacement (masked) and check for newlines
             $msg2 = 'FCM: Private key after processing: ' . substr($jsonKey['private_key'], 0, 50) . '...';
