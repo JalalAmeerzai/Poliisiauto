@@ -44,6 +44,10 @@ Route::prefix('v1')->group(function () use ($ctrl) {
         return view('welcome');
     })->name('home');
 
+    Route::get('/ping', function () {
+        return response()->json(true);
+    });
+
     Route::post('register', [$ctrl['Auth'], 'register']);
     Route::post('login', [$ctrl['Auth'], 'login']);
 
